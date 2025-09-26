@@ -1,31 +1,39 @@
 package com.example.productosapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.example.productosapp.databinding.ActivityFormularioProductoBinding;
+
 public class FormularioProductoActivity extends AppCompatActivity {
+
+    private ActivityFormularioProductoBinding binding;
+    private ProductoViewModel productoViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_formulario_producto);
+        binding = ActivityFormularioProductoBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        EditText txtCodigo = findViewById(R.id.txtCodigo);
-        EditText txtDescripcion = findViewById(R.id.txtDescripcion);
-        EditText txtPrecio = findViewById(R.id.txtPrecio);
-        Button btnGuardar = findViewById(R.id.btnGuardar);
+        // ✅ ViewModel compartido a nivel de aplicación
+        productoViewModel = new ViewModelProvider(
+                this,
+                ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())
+        ).get(ProductoViewModel.class);
 
-        btnGuardar.setOnClickListener(v -> {
-            String codigo = txtCodigo.getText().toString().trim();
-            String descripcion = txtDescripcion.getText().toString().trim();
-            String precioStr = txtPrecio.getText().toString().trim();
+        binding.btnGuardar.setOnClickListener(v -> {
+            String codigo = binding.txtCodigo.getText().toString().trim();
+            String descripcion = binding.txtDescripcion.getText().toString().trim();
+            String precioStr = binding.txtPrecio.getText().toString().trim();
 
             if (codigo.isEmpty() || descripcion.isEmpty() || precioStr.isEmpty()) {
                 Toast.makeText(this, "Complete todos los campos", Toast.LENGTH_SHORT).show();
+                Log.d("DEBUG", "❌ Campos vacíos");
                 return;
             }
 
@@ -34,21 +42,23 @@ public class FormularioProductoActivity extends AppCompatActivity {
                 precio = Double.parseDouble(precioStr);
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Precio inválido", Toast.LENGTH_SHORT).show();
+                Log.d("DEBUG", "❌ Precio inválido: " + precioStr);
                 return;
             }
 
-            // Verificar duplicados
-            for (Producto p : MainActivity.listaProductos) {
-                if (p.getCodigo().equals(codigo)) {
-                    Toast.makeText(this, "Código duplicado", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
+            // ✅ Agregar producto con validación desde ViewModel
+            boolean agregado = productoViewModel.agregarProducto(
+                    new Producto(codigo, descripcion, precio)
+            );
 
-            // Agregar producto
-            MainActivity.listaProductos.add(new Producto(codigo, descripcion, precio));
-            Toast.makeText(this, "Producto agregado", Toast.LENGTH_SHORT).show();
-            finish(); // vuelve a la lista
+            if (agregado) {
+                Log.d("DEBUG", "✅ Producto agregado: " + codigo + " - " + descripcion + " ($" + precio + ")");
+                Toast.makeText(this, "Producto agregado", Toast.LENGTH_SHORT).show();
+                finish(); // vuelve a la lista
+            } else {
+                Log.d("DEBUG", "⚠️ Código duplicado: " + codigo);
+                Toast.makeText(this, "Código duplicado", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

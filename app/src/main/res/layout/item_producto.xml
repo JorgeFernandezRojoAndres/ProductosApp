@@ -8,41 +8,53 @@
     app:cardElevation="6dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    android:background="@color/white"> <!-- ✅ Fondo sólido -->
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Código -->
         <TextView
             android:id="@+id/txtCodigo"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Código"
+            android:text="@string/label_codigo"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@android:color/black" />
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Descripción -->
         <TextView
             android:id="@+id/txtDescripcion"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Descripción"
+            android:text="@string/label_descripcion"
             android:textSize="14sp"
+            android:textColor="@color/dark_gray"
             android:layout_marginTop="4dp"
-            android:textColor="@android:color/darker_gray" />
+            app:layout_constraintTop_toBottomOf="@id/txtCodigo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Precio -->
         <TextView
             android:id="@+id/txtPrecio"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Precio"
+            android:text="@string/label_precio"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:textColor="@color/green_dark"
             android:layout_marginTop="4dp"
-            android:textColor="@android:color/holo_green_dark" />
+            app:layout_constraintTop_toBottomOf="@id/txtDescripcion"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

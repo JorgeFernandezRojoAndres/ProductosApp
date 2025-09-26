@@ -25,9 +25,15 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    // ✅ Activar ViewBinding
+    buildFeatures {
+        viewBinding = true
     }
 }
 
@@ -37,9 +43,8 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
 
-    // ✅ RecyclerView
+    // ✅ RecyclerView (dejamos solo una para evitar duplicados)
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation(libs.recyclerview)
 
     // ✅ CardView
     implementation("androidx.cardview:cardview:1.0.0")

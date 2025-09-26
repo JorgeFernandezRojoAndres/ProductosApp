@@ -2,41 +2,39 @@ package com.example.productosapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Button;
 import android.content.Intent;
 import androidx.appcompat.app.AlertDialog;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.example.productosapp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    // 📌 Lista compartida de productos (accesible desde cualquier Activity)
-    public static List<Producto> listaProductos = new ArrayList<>();
+    // ⚠️ Antes estaba aquí la lista estática de productos.
+    // public static List<Producto> listaProductos = new ArrayList<>();
+    // 👉 Esto lo vamos a manejar desde ProductoViewModel (paso siguiente).
+
+    private ActivityMainBinding binding; // 📌 ViewBinding
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        Button btnCargar = findViewById(R.id.btnCargar);
-        Button btnListar = findViewById(R.id.btnListar);
-        Button btnSalir = findViewById(R.id.btnSalir);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Ir a formulario para cargar producto
-        btnCargar.setOnClickListener(v -> {
+        binding.btnCargar.setOnClickListener(v -> {
             Intent intent = new Intent(this, FormularioProductoActivity.class);
             startActivity(intent);
         });
 
         // Ir a lista de productos
-        btnListar.setOnClickListener(v -> {
+        binding.btnListar.setOnClickListener(v -> {
             Intent intent = new Intent(this, ListaProductosActivity.class);
             startActivity(intent);
         });
 
         // Salir de la app
-        btnSalir.setOnClickListener(v -> {
+        binding.btnSalir.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Salir")
                     .setMessage("¿Desea cerrar la aplicación?")

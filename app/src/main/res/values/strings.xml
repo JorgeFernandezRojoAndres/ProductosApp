@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">ProductosApp</string>
+
+    <!-- Formulario Producto -->
+    <string name="hint_codigo">Código</string>
+    <string name="hint_descripcion">Descripción</string>
+    <string name="hint_precio">Precio</string>
+    <string name="btn_guardar">Guardar</string>
+
+    <!-- Item Producto -->
+    <string name="label_codigo">Código</string>
+    <string name="label_descripcion">Descripción</string>
+    <string name="label_precio">Precio</string>
 </resources>
