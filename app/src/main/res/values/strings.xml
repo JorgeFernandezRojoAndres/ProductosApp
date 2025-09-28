@@ -11,4 +11,8 @@
     <string name="label_codigo">Código</string>
     <string name="label_descripcion">Descripción</string>
     <string name="label_precio">Precio</string>
+
+    <!-- Navigation Drawer -->
+    <string name="navigation_drawer_open">Abrir menú de navegación</string>
+    <string name="navigation_drawer_close">Cerrar menú de navegación</string>
 </resources>

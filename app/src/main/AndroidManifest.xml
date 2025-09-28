@@ -14,7 +14,7 @@
         android:theme="@style/Theme.ProductosApp">
 
         <activity android:name=".FormularioProductoActivity" />
-        <activity android:name=".ListaProductosActivity" />
+        <activity android:name=".ListaProductosFragment" />
 
         <activity
             android:name=".MainActivity"

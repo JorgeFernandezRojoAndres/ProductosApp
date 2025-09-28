@@ -1,6 +1,7 @@
 package com.example.productosapp;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -62,5 +63,31 @@ public class ProductoViewModel extends AndroidViewModel {
             productosLiveData.setValue(lista);
         }
         return eliminado;
+    }
+
+    // ✅ Nueva función: validación + alta de producto
+    public boolean validarYAgregar(String codigo, String descripcion, String precioStr) {
+        if (codigo.isEmpty() || descripcion.isEmpty() || precioStr.isEmpty()) {
+            Log.d("DEBUG", "❌ Campos vacíos");
+            return false;
+        }
+
+        double precio;
+        try {
+            precio = Double.parseDouble(precioStr);
+        } catch (NumberFormatException e) {
+            Log.d("DEBUG", "❌ Precio inválido: " + precioStr);
+            return false;
+        }
+
+        boolean agregado = agregarProducto(new Producto(codigo, descripcion, precio));
+
+        if (agregado) {
+            Log.d("DEBUG", "✅ Producto agregado: " + codigo + " - " + descripcion + " ($" + precio + ")");
+        } else {
+            Log.d("DEBUG", "⚠️ Código duplicado: " + codigo);
+        }
+
+        return agregado;
     }
 }
