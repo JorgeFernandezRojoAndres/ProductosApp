@@ -33,14 +33,12 @@ public class ListaProductosFragment extends Fragment {
         adapter = new ProductoAdapter();
         recyclerView.setAdapter(adapter);
 
-        // ✅ Usamos ListarProductosViewModel
+        // ✅ ViewModel propio de listar
         viewModel = new ViewModelProvider(this).get(ListarProductosViewModel.class);
 
-        // ✅ Observamos la lista ordenada del repo
+        // ✅ Observamos la lista ordenada del repo (nunca null, puede estar vacía)
         viewModel.getProductosOrdenados().observe(getViewLifecycleOwner(), lista -> {
-            if (lista != null) {
-                adapter.setProductos(lista);
-            }
+            adapter.setProductos(lista); // lista ya es List<Producto>
         });
     }
 }

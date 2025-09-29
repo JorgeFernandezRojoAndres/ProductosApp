@@ -34,10 +34,10 @@ public class FormularioProductoFragment extends Fragment {
         etPrecio = view.findViewById(R.id.etPrecio);
         btnGuardar = view.findViewById(R.id.btnGuardar);
 
-        // ✅ Usamos requireActivity() para compartir el mismo ViewModel entre fragments
+        // ✅ Cada fragment tiene su propio ViewModel (no se comparte con Lista)
         viewModel = new ViewModelProvider(this).get(CargarProductoViewModel.class);
 
-        // Observers de error y éxito
+        // Observers de error y éxito (nunca serán null)
         viewModel.getError().observe(getViewLifecycleOwner(), msg ->
                 Toast.makeText(getContext(), "❌ " + msg, Toast.LENGTH_SHORT).show()
         );
@@ -52,7 +52,7 @@ public class FormularioProductoFragment extends Fragment {
             String precio = etPrecio.getText().toString();
             viewModel.guardarProducto(codigo, descripcion, precio);
 
-            // Limpio los campos si todo salió bien
+            // 🔄 Limpio siempre los campos después de guardar
             etCodigo.setText("");
             etDescripcion.setText("");
             etPrecio.setText("");
