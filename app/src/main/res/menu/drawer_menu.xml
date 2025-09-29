@@ -11,5 +11,18 @@
             android:title="Listar Productos"
             android:icon="@android:drawable/ic_menu_agenda" />
 
+        <!-- 🆕 Nueva opción Modificar -->
+        <item
+            android:id="@+id/nav_modificar"
+            android:title="Modificar Producto"
+            android:icon="@android:drawable/ic_menu_edit" />
+
+        <!-- 🆕 Opción especial: Salir (⚠️ no existe en nav_graph, se maneja en MainActivity) -->
+        <item
+            android:id="@+id/nav_salir"
+            android:title="Salir"
+            android:icon="@android:drawable/ic_lock_power_off"
+            android:checkable="false" /> <!-- 🚩 Importante: que no sea checkable -->
+
     </group>
 </menu>

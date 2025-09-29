@@ -31,7 +31,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    // ✅ Activar ViewBinding
     buildFeatures {
         viewBinding = true
     }
@@ -43,11 +42,16 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
 
-    // ✅ RecyclerView (dejamos solo una para evitar duplicados)
+    // ✅ RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.4.0")
 
     // ✅ CardView
     implementation("androidx.cardview:cardview:1.0.0")
+
+    // ✅ Navigation Component
+    implementation("androidx.navigation:navigation-fragment:2.9.5")
+    implementation("androidx.navigation:navigation-ui:2.9.5")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

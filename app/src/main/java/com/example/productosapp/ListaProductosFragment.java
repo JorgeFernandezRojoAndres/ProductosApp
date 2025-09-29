@@ -20,7 +20,8 @@ public class ListaProductosFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_lista_productos, container, false);
     }
 
@@ -30,15 +31,14 @@ public class ListaProductosFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerViewProductos);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         adapter = new ProductoAdapter();
         recyclerView.setAdapter(adapter);
 
-        // ✅ ViewModel propio de listar
-        viewModel = new ViewModelProvider(this).get(ListarProductosViewModel.class);
+        // ✅ Usamos requireActivity() para compartir el mismo ViewModel
+        viewModel = new ViewModelProvider(requireActivity()).get(ListarProductosViewModel.class);
 
-        // ✅ Observamos la lista ordenada del repo (nunca null, puede estar vacía)
-        viewModel.getProductosOrdenados().observe(getViewLifecycleOwner(), lista -> {
-            adapter.setProductos(lista); // lista ya es List<Producto>
-        });
+        // ✅ El ViewModel ya garantiza nunca null → solo observamos y actualizamos
+        viewModel.getProductosOrdenados().observe(getViewLifecycleOwner(), adapter::setProductos);
     }
 }

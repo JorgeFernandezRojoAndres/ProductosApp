@@ -1,61 +1,79 @@
 package com.example.productosapp;
 
 import android.os.Bundle;
-import android.view.MenuItem;
-
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.navigation.NavigationView;
 
-// 👇 Import correcto para acceder a R.id.nav_cargar y nav_listar
-import com.example.productosapp.R;
-
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
+    private AppBarConfiguration appBarConfiguration;
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        // ✅ Toolbar
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close);
+        // ✅ Obtiene el NavController desde el NavHostFragment
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment);
+        navController = navHostFragment.getNavController();
 
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        // 🚩 Ajuste: solo destinos top-level en el Drawer
+        appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_cargar,
+                R.id.nav_listar,
+                R.id.nav_modificar
+        ).setOpenableLayout(drawerLayout).build();
 
-        navigationView.setNavigationItemSelectedListener(this);
+        // ✅ Sincronizar Toolbar + Drawer con NavController
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
 
-        // Primer fragment por defecto
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new FormularioProductoFragment())
-                    .commit();
-            navigationView.setCheckedItem(R.id.nav_cargar);
-        }
+        // ✅ Manejo de opción especial "Salir"
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_salir) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Salir")
+                        .setMessage("¿Seguro que querés cerrar la aplicación?")
+                        .setPositiveButton("Sí", (dialog, which) -> finishAffinity())
+                        .setNegativeButton("Cancelar", null)
+                        .show();
+                return true;
+            } else {
+                boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
+                if (handled) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }
+                return handled;
+            }
+        });
 
-        // ✅ Manejo moderno del botón atrás (sin warnings)
+        // ✅ Manejo moderno del botón atrás (cierra Drawer si está abierto)
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
-                    // Si querés comportamiento normal, deshabilitás el callback y llamás a back
                     setEnabled(false);
                     MainActivity.super.onBackPressed();
                 }
@@ -64,20 +82,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId(); // 👈 lo guardamos en variable para que no dé error
-
-        if (id == R.id.nav_cargar) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new FormularioProductoFragment())
-                    .commit();
-        } else if (id == R.id.nav_listar) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new ListaProductosFragment())
-                    .commit();
-        }
-
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
+    public boolean onSupportNavigateUp() {
+        return NavigationUI.navigateUp(navController, appBarConfiguration)
+                || super.onSupportNavigateUp();
     }
 }

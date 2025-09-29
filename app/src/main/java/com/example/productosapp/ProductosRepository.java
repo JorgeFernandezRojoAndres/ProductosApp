@@ -27,6 +27,14 @@ public class ProductosRepository {
         List<Producto> lista = productos.getValue();
         if (lista == null) lista = new ArrayList<>();
         lista.add(nuevo);
-        productos.setValue(lista);
+        productos.setValue(lista); // 🔥 notifica cambios
+    }
+
+    // 🆕 Nuevo método para actualizar la lista completa
+    public void actualizarLista(List<Producto> listaActualizada) {
+        if (listaActualizada == null) {
+            listaActualizada = new ArrayList<>();
+        }
+        productos.setValue(listaActualizada); // 🔥 fuerza actualización del LiveData
     }
 }
