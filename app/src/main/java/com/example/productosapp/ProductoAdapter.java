@@ -1,85 +1,59 @@
 package com.example.productosapp;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.productosapp.databinding.ItemProductoBinding;
-
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHolder> {
+public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder> {
 
-    private List<Producto> productos;
-    private OnItemClickListener listener;
+    private final List<Producto> productos = new ArrayList<>();
 
-    // ✅ Interfaz para manejar clicks en los ítems
-    public interface OnItemClickListener {
-        void onItemClick(Producto producto);
-    }
-
-    public ProductoAdapter() {
-        // vacío por defecto
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
-
-    public void setProductos(List<Producto> nuevos) {
-        this.productos = nuevos;
-        ordenarPorDescripcion();
-        notifyDataSetChanged();
-    }
-
-    private void ordenarPorDescripcion() {
-        if (productos != null) {
-            Collections.sort(productos, Comparator.comparing(
-                    Producto::getDescripcion, String.CASE_INSENSITIVE_ORDER));
+    // Método público para actualizar la lista
+    public void setProductos(List<Producto> nuevaLista) {
+        productos.clear();
+        if (nuevaLista != null) {
+            productos.addAll(nuevaLista); // copiamos los datos en lugar de asignar referencia
         }
+        notifyDataSetChanged(); // refresca todo el RecyclerView
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemProductoBinding binding = ItemProductoBinding.inflate(
-                LayoutInflater.from(parent.getContext()), parent, false
-        );
-        return new ViewHolder(binding);
+    public ProductoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_producto, parent, false);
+        return new ProductoViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ProductoViewHolder holder, int position) {
         Producto producto = productos.get(position);
-        holder.bind(producto, listener);
+
+        holder.tvCodigo.setText("Código: " + producto.getCodigo());
+        holder.tvDescripcion.setText("Descripción: " + producto.getDescripcion());
+        holder.tvPrecio.setText(String.format("Precio: $%.2f", producto.getPrecio()));
     }
 
     @Override
     public int getItemCount() {
-        return (productos == null) ? 0 : productos.size();
+        return productos.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        private final ItemProductoBinding binding;
+    static class ProductoViewHolder extends RecyclerView.ViewHolder {
+        TextView tvCodigo, tvDescripcion, tvPrecio;
 
-        ViewHolder(ItemProductoBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-
-        void bind(Producto producto, OnItemClickListener listener) {
-            binding.txtDescripcion.setText(producto.getDescripcion());
-            binding.txtCodigo.setText("Código: " + producto.getCodigo());
-            binding.txtPrecio.setText("$ " + producto.getPrecio());
-
-            // ✅ Click opcional en el item
-            itemView.setOnClickListener(v -> {
-                if (listener != null) listener.onItemClick(producto);
-            });
+        public ProductoViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvCodigo = itemView.findViewById(R.id.tvCodigo);
+            tvDescripcion = itemView.findViewById(R.id.tvDescripcion);
+            tvPrecio = itemView.findViewById(R.id.tvPrecio);
         }
     }
 }

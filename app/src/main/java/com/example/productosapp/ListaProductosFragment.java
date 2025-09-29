@@ -10,39 +10,37 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import com.example.productosapp.databinding.FragmentListaProductosBinding;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ListaProductosFragment extends Fragment {
 
-    private FragmentListaProductosBinding binding;
     private ProductoAdapter adapter;
-    private ProductoViewModel productoViewModel;
+    private RecyclerView recyclerView;
+    private ListarProductosViewModel viewModel;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_lista_productos, container, false);
+    }
 
-        binding = FragmentListaProductosBinding.inflate(inflater, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        // Configurar RecyclerView
+        recyclerView = view.findViewById(R.id.recyclerViewProductos);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ProductoAdapter();
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
 
-        // ✅ ViewModel compartido a nivel de aplicación
-        productoViewModel = new ViewModelProvider(
-                requireActivity(),
-                ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().getApplication())
-        ).get(ProductoViewModel.class);
+        // ✅ Usamos ListarProductosViewModel
+        viewModel = new ViewModelProvider(this).get(ListarProductosViewModel.class);
 
-        // 👀 Observar cambios en la lista de productos
-        productoViewModel.getProductos().observe(getViewLifecycleOwner(), productos -> {
-            adapter.setProductos(productos);
+        // ✅ Observamos la lista ordenada del repo
+        viewModel.getProductosOrdenados().observe(getViewLifecycleOwner(), lista -> {
+            if (lista != null) {
+                adapter.setProductos(lista);
+            }
         });
-
-        return binding.getRoot();
     }
 }
