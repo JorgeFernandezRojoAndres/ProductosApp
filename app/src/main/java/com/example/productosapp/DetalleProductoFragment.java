@@ -18,7 +18,6 @@ public class DetalleProductoFragment extends Fragment {
 
     private EditText etCodigo, etDescripcion, etPrecio;
     private Button btnGuardar;
-    private Producto producto;
     private CargarProductoViewModel cargarViewModel;
 
     @Nullable
@@ -34,29 +33,24 @@ public class DetalleProductoFragment extends Fragment {
 
         cargarViewModel = new ViewModelProvider(requireActivity()).get(CargarProductoViewModel.class);
 
-        // ✅ Recuperar producto de argumentos
-        if (getArguments() != null && getArguments().containsKey("producto")) {
-            producto = (Producto) getArguments().getSerializable("producto");
-        }
+        // 🚩 Pasar siempre el bundle al ViewModel
+        cargarViewModel.initFromArgs(getArguments());
 
-        // ✅ Mostrar datos si existe el producto
-        if (producto != null) {
-            etCodigo.setText(producto.getCodigo());
-            etDescripcion.setText(producto.getDescripcion());
-            etPrecio.setText(String.valueOf(producto.getPrecio()));
-        }
+        // 🚩 Observar el producto actual y poblar campos
+        cargarViewModel.getProductoActual().observe(getViewLifecycleOwner(), p -> {
+            etCodigo.setText(p.getCodigo());
+            etDescripcion.setText(p.getDescripcion());
+            etPrecio.setText(String.valueOf(p.getPrecio()));
+        });
 
-        // ✅ Acción Guardar → delega todo al ViewModel
-        btnGuardar.setOnClickListener(view -> {
-            if (producto != null) {
+        // ✅ Acción Guardar → siempre delega al ViewModel
+        btnGuardar.setOnClickListener(view ->
                 cargarViewModel.actualizarProducto(
-                        producto,
                         etCodigo.getText().toString(),
                         etDescripcion.getText().toString(),
                         etPrecio.getText().toString()
-                );
-            }
-        });
+                )
+        );
 
         // ✅ Observar errores
         cargarViewModel.getError().observe(getViewLifecycleOwner(), errorMsg ->

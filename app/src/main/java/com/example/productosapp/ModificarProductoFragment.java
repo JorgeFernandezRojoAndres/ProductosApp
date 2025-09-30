@@ -29,21 +29,24 @@ public class ModificarProductoFragment extends Fragment {
         etCodigo = v.findViewById(R.id.etCodigo);
         btnBuscar = v.findViewById(R.id.btnBuscar);
 
-        // Reutilizamos el ViewModel de Listar
         listarViewModel = new ViewModelProvider(requireActivity()).get(ListarProductosViewModel.class);
 
-        btnBuscar.setOnClickListener(view -> {
-            String codigo = etCodigo.getText().toString().trim();
-            Producto producto = listarViewModel.buscarPorCodigo(codigo);
-
-            if (producto != null) {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("producto", producto);
-                Navigation.findNavController(view).navigate(R.id.nav_detalle, bundle);
-            } else {
-                Toast.makeText(getContext(), "❌ Producto no encontrado", Toast.LENGTH_SHORT).show();
-            }
+        // 🚩 Observa producto encontrado
+        listarViewModel.getProductoEncontrado().observe(getViewLifecycleOwner(), producto -> {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("producto", producto);
+            Navigation.findNavController(requireView()).navigate(R.id.nav_detalle, bundle);
         });
+
+        // 🚩 Observa errores
+        listarViewModel.getError().observe(getViewLifecycleOwner(), errorMsg ->
+                Toast.makeText(getContext(), "❌ " + errorMsg, Toast.LENGTH_SHORT).show()
+        );
+
+        // 🚩 Acción buscar delegada al ViewModel
+        btnBuscar.setOnClickListener(view ->
+                listarViewModel.buscarPorCodigo(etCodigo.getText().toString().trim())
+        );
 
         return v;
     }

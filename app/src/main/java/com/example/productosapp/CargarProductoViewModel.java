@@ -1,5 +1,7 @@
 package com.example.productosapp;
 
+import android.os.Bundle;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -9,10 +11,22 @@ import java.util.List;
 public class CargarProductoViewModel extends ViewModel {
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<String> exito = new MutableLiveData<>();
+    private final MutableLiveData<Producto> productoActual = new MutableLiveData<>();
     private final ProductosRepository repo = ProductosRepository.getInstance(); // ✅ usa el repo compartido
 
     public LiveData<String> getError() { return error; }
     public LiveData<String> getExito() { return exito; }
+    public LiveData<Producto> getProductoActual() { return productoActual; }
+
+    // 🚩 Inicializar desde argumentos
+    public void initFromArgs(Bundle args) {
+        if (args != null && args.containsKey("producto")) {
+            Producto recibido = (Producto) args.getSerializable("producto");
+            if (recibido != null) {
+                productoActual.setValue(recibido);
+            }
+        }
+    }
 
     public void guardarProducto(String codigo, String descripcion, String precioStr) {
         if (codigo.isEmpty() || descripcion.isEmpty() || precioStr.isEmpty()) {
@@ -42,7 +56,7 @@ public class CargarProductoViewModel extends ViewModel {
         exito.setValue("Producto agregado con éxito");
     }
 
-    // 🆕 Nuevo método para actualizar un producto existente
+    // ✅ Actualizar producto existente
     public void actualizarProducto(Producto productoActualizado) {
         if (productoActualizado.getCodigo().isEmpty()
                 || productoActualizado.getDescripcion().isEmpty()) {
@@ -63,6 +77,7 @@ public class CargarProductoViewModel extends ViewModel {
                 if (p.getCodigo().equals(productoActualizado.getCodigo())) {
                     lista.set(i, productoActualizado);
                     repo.actualizarLista(lista); // ✅ notificamos al repo para refrescar LiveData
+                    productoActual.setValue(productoActualizado); // 🚩 refresca en observers
                     exito.setValue("Producto actualizado con éxito");
                     return;
                 }
@@ -71,8 +86,14 @@ public class CargarProductoViewModel extends ViewModel {
         error.setValue("Producto no encontrado");
     }
 
-    // 🆕 Sobrecarga que recibe Strings y valida (para usar directo desde el Fragment)
-    public void actualizarProducto(Producto productoActual, String codigo, String descripcion, String precioStr) {
+    // ✅ Sobrecarga que recibe Strings (llamada desde el Fragment)
+    public void actualizarProducto(String codigo, String descripcion, String precioStr) {
+        Producto actual = productoActual.getValue();
+        if (actual == null) {
+            error.setValue("No hay producto cargado");
+            return;
+        }
+
         if (codigo == null || codigo.trim().isEmpty()
                 || descripcion == null || descripcion.trim().isEmpty()
                 || precioStr == null || precioStr.trim().isEmpty()) {
@@ -88,12 +109,10 @@ public class CargarProductoViewModel extends ViewModel {
             return;
         }
 
-        productoActual.setCodigo(codigo.trim());
-        productoActual.setDescripcion(descripcion.trim());
-        productoActual.setPrecio(precio);
+        actual.setCodigo(codigo.trim());
+        actual.setDescripcion(descripcion.trim());
+        actual.setPrecio(precio);
 
-        // Reutiliza el método existente
-        actualizarProducto(productoActual);
+        actualizarProducto(actual); // reutiliza la lógica
     }
-
 }
